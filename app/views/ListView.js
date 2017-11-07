@@ -23,8 +23,8 @@ var List = Marionette.CollectionView.extend({
     removeItem: function(child) {
         console.log(child.model.destroy({
             success: function() {
-                console.log('Item was removed');
-            }   
+                console.log('Item with id = '+ child.model.cid +' was removed');
+            }
         }
     ));
     }

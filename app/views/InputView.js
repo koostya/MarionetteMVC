@@ -1,6 +1,7 @@
 import Marionette from 'backbone.marionette';
 
 import template from '../templates/Input.html';
+import ItemModel from '../models/Item';
 
 const InputView = Marionette.View.extend({
     template: template,
@@ -24,13 +25,16 @@ const InputView = Marionette.View.extend({
     AddItem: function(e) {
         if(e.keyCode == 13) {
             console.log(e.target.value);
+            let item = new ItemModel({
+                text: e.target.value,
+                completed: false
+            });
             this.model.set({
                 text: e.target.value,
                 completed: false
             }, {validate: true});
 
-            let items = this.model.pick('text', 'completed');
-            this.collection.add(items);
+            this.collection.add(item);
         }
     },
 
