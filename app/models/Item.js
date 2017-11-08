@@ -1,4 +1,5 @@
 import Backbone from 'backbone';
+import {LocalStorage} from 'backbone.localstorage';
 
 const Item = Backbone.Model.extend({
    defaults: {
@@ -7,7 +8,7 @@ const Item = Backbone.Model.extend({
    },
 
     validate: function(args) {
-       console.log(args);
+
     }
 });
 

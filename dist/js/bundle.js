@@ -99,7 +99,7 @@ eval("var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;// Marione
 /***/ }),
 /* 3 */
 /*!***********************!*\
-  !*** ./app/driver.js ***!
+  !*** ./app/app.js ***!
   \***********************/
 /*! dynamic exports provided */
 /*! all exports used */

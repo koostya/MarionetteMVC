@@ -5,15 +5,12 @@ import LayoutView from './views/LayoutView';
 import ItemModel from './models/Item';
 import ItemsCollection from './collections/ItemsCollection';
 
-const initialData = [
-    {text: 'Here some text!', completed: false},
-    {text: 'Here some text to!', completed: false}
-];
+const initialData = window.localStorage;
 
 const app = new Marionette.Application({
     onStart: function(options) {
         var layout = new LayoutView({
-            collection: new ItemsCollection(initialData),
+            collection: new ItemsCollection(options.initialData),
             model: new ItemModel()
         });
         layout.render();

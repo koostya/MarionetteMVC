@@ -24,25 +24,23 @@ const InputView = Marionette.View.extend({
 
     AddItem: function(e) {
         if(e.keyCode == 13) {
-            console.log(e.target.value);
             let item = new ItemModel({
                 text: e.target.value,
                 completed: false
             });
+
             this.model.set({
                 text: e.target.value,
                 completed: false
             }, {validate: true});
 
             this.collection.add(item);
+            // this.model.save(item);
+            this.model.fetch(item);
         }
     },
 
     itemAdded: function() {
-        this.model.set({
-            text: '',
-            completed: false
-        });
         console.log('New Item added');
     }
 });

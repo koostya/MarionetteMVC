@@ -2,7 +2,7 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
-    entry: './app/driver.js',
+    entry: './app/app.js',
     output: {
         filename: 'dist/js/bundle.js'
     },

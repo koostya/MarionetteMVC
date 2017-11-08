@@ -6,6 +6,12 @@ import ItemModel from '../models/Item';
 const ItemsCollection = Backbone.Collection.extend({
     model: ItemModel,
 
+    comparator: 'created',
+
+    initialize: function() {
+        this.fetch();
+    },
+
     localStorage: new LocalStorage('ItemsList')
 });
 
