@@ -1,11 +1,18 @@
 import Backbone from 'backbone';
-import {LocalStorage} from 'backbone.localstorage';
 
 const Item = Backbone.Model.extend({
    defaults: {
        text: '',
        completed: false
    },
+
+    initialize: function() {
+
+    },
+
+    remove: function() {
+        this.destroy();
+    },
 
     validate: function(args) {
 

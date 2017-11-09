@@ -3,6 +3,10 @@
     padding: 0;
 }
 
+li {
+    list-style: none;
+}
+
 .wrapper {
     position: relative;
     font-family: sans-serif;
@@ -295,4 +299,13 @@
     padding: 0 16px 0 60px;
     color: #000;
     font-size: 20px;
+    display: none;
+}
+
+.updateInput:focus {
+    outline: rgb(0,0,0) solid 2px;
+}
+
+.edit .updateInput {
+    display: block;
 }

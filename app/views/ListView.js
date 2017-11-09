@@ -8,14 +8,26 @@ var ListItem = Marionette.View.extend({
     tagName: 'li',
     template: template,
 
+    // initialize: function() {
+    //     this.model.bind('change', this.render);
+    // },
+    //
+    // render: function() {
+    //     let text = this.model.get('text');
+    //
+    //     console.log(this.$('.text > span').text());
+    // },
+
     ui: {
-        editInput: 'input'
+        remove: '.remove',
+        edit: '.item',
+        editInput: '.updateInput'
     },
 
     triggers: {
-        'dblclick': 'remove:item',
-        'contextmenu': 'edit:item',
-        'blur @ui.editInput': 'input:blur'
+        'click @ui.remove': 'remove:item',
+        'dblclick @ui.edit': 'edit:item',
+        'blur @ui.editInput': 'edit:confirm'
     }
 });
 
@@ -26,46 +38,27 @@ var List = Marionette.CollectionView.extend({
     childViewEvents: {
         'remove:item': 'removeItem',
         'edit:item': 'editItem',
-        'input:blur': 'onInputBlur'
+        'input:blur': 'onInputBlur',
+        'edit:confirm': 'confirmChangesOfItem'
     },
 
     removeItem: function(child) {
-        child.model.destroy({
-            success: function() {
-                console.log('Item with id = '+ child.model.cid +' was removed');
-            }
-        });
+        child.model.remove();
     },
 
     editItem: function(child) {
-        let input = document.createElement('input');
-        input.style.position = 'absolute';
-        input.style.width = '100%';
-        input.style.height = '100%';
-        input.style.top = '0';
-        input.style.left = '0';
-        input.style.width = '173px  ';
-        input.value = child.el.innerHTML;
-        child.el.appendChild(input);
-        child.el.style.position = 'relative';
+        child.el.classList.add('edit');
+        let editInput = child.el.children[0].children[3].value;
+        console.log(child.el.children[0].children[3].value);
     },
 
-    onInputBlur: function(child) {
-        let item = new ItemModel({
-            text: child.el.children[0].value,
-            completed: false
-        });
-
-        item.set({
-            text: child.el.children[0].value,
-            completed: false
+    confirmChangesOfItem: function(child) {
+        let editInput = child.el.children[0].children[3];
+        child.model.set({
+            text: editInput.value
         }, {validate: true});
-
-        child.el.children[0].parentNode.removeChild(child.el.children[0]);
-
-        this.collection.add(item);
-        this.model.save(item);
-        this.model.fetch(item);
+        child.model.save();
+        editInput.style.display = 'none';
     }
 });
 

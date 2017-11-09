@@ -35,8 +35,10 @@ const InputView = Marionette.View.extend({
             }, {validate: true});
 
             this.collection.add(item);
+            console.log(this.model);
+
             // this.model.save(item);
-            this.model.fetch(item);
+            // this.model.fetch(item);
         }
     },
 
