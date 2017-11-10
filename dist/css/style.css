@@ -178,19 +178,23 @@ li {
 
 .menu {
     position: relative;
-    display: none;
+    display: block;
+    font-size: 12px;
+    color: #777;
+}
+
+.menu .menu_inner {
+    display: flex;
     align-items: center;
     justify-content: space-between;
     height: 40px;
-    font-size: 12px;
-    color: #777;
 }
 
 .mvc.active .menu {
     display: flex;
 }
 
-.mvc.active .menu:before {
+.mvc .menu:before {
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 8px 0 -3px #f6f6f6, 0 9px 1px -3px rgba(0, 0, 0, 0.2), 0 16px 0 -6px #f6f6f6, 0 17px 2px -6px rgba(0, 0, 0, 0.2);
 }
 
@@ -199,7 +203,7 @@ li {
     position: absolute;
     right: 0;
     left: 0;
-    height: 50px;
+    height: 100%;
     bottom: 0;
 }
 
@@ -234,7 +238,6 @@ li {
     color: #777;
     font-size: 12px;
     padding-right: 10px;
-    visibility: hidden;
 }
 
 #clear_completed:focus {
@@ -257,7 +260,6 @@ li {
     height: 30px;
     top: 50%;
     transform: translateY(-50%);
-    visibility: hidden;
 }
 
 .choose_all.active {

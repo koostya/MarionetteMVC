@@ -3,7 +3,9 @@ import Backbone from 'backbone';
 const Item = Backbone.Model.extend({
    defaults: {
        text: '',
-       completed: false
+       completed: false,
+       checkboxID: '',
+       checked: ''
    },
 
     initialize: function() {
@@ -16,6 +18,11 @@ const Item = Backbone.Model.extend({
 
     validate: function(args) {
 
+    },
+
+    createCheckboxID: function() {
+       let id = +new Date();
+       return id;
     }
 });
 

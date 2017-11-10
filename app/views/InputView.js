@@ -10,8 +10,26 @@ const InputView = Marionette.View.extend({
         change: 'render'
     },
 
+    initialize: function() {
+        this.collection.bind('add', this.render);
+        this.collection.bind('remove', this.render);
+        this.collection.bind('change', this.render);
+    },
+
+    render: function() {
+        $(this.el).html(this.template(template));
+        if(this.collection.length >= 1) {
+            this.$('.choose_all').show();
+        } else {
+            this.$('.choose_all').hide();
+        }
+
+        this.checkIsAllItemsCompleted();
+    },
+
     ui: {
-        input: 'input[type="text"]'
+        input: 'input[type="text"]',
+        selectAllBut: '.choose_all'
     },
 
     collectionEvents: {
@@ -19,31 +37,63 @@ const InputView = Marionette.View.extend({
     },
 
     events: {
-        'keypress @ui.input': 'AddItem'
+        'keypress @ui.input': 'AddItem',
+        'change @ui.selectAllBut': 'CompleteAllItems'
     },
 
     AddItem: function(e) {
         if(e.keyCode == 13) {
             let item = new ItemModel({
                 text: e.target.value,
-                completed: false
+                completed: false,
+                checkboxID: this.model.createCheckboxID(),
+                checked: ''
             });
 
             this.model.set({
                 text: e.target.value,
-                completed: false
+                completed: false,
+                checkboxID: this.model.createCheckboxID(),
+                checked: ''
             }, {validate: true});
 
             this.collection.add(item);
-            console.log(this.model);
-
-            // this.model.save(item);
-            // this.model.fetch(item);
         }
     },
 
     itemAdded: function() {
         console.log('New Item added');
+    },
+
+    CompleteAllItems: function() {
+        let completed, checked;
+        if(this.$('#choose_all')[0].checked) {
+            completed = true;
+            checked = 'checked';
+        } else {
+            completed = false;
+            checked = '';
+        }
+        for(let i = 0; i < this.collection.models.length; i++) {
+            this.collection.models[i].set({
+                completed: completed,
+                checked: checked
+            });
+        }
+    },
+
+    checkIsAllItemsCompleted: function() {
+        let count = 0;
+        for(let i = 0; i < this.collection.models.length; i++) {
+            if(this.collection.models[i].get('completed') == true) {
+                count++;
+            }
+        }
+        if(count == this.collection.length) {
+            this.$('#choose_all')[0].checked = true;
+        } else {
+            this.$('#choose_all')[0].checked = false;
+        }
     }
 });
 

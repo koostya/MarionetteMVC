@@ -8,26 +8,31 @@ var ListItem = Marionette.View.extend({
     tagName: 'li',
     template: template,
 
-    // initialize: function() {
-    //     this.model.bind('change', this.render);
-    // },
-    //
-    // render: function() {
-    //     let text = this.model.get('text');
-    //
-    //     console.log(this.$('.text > span').text());
-    // },
+    initialize: function() {
+        this.model.bind('change', this.render);
+    },
+
+    render: function() {
+        let text = this.model.get('text');
+
+        $(this.el).html(this.template(this.model.toJSON()));
+        this.model.save();
+
+        return this;
+    },
 
     ui: {
         remove: '.remove',
         edit: '.item',
-        editInput: '.updateInput'
+        editInput: '.updateInput',
+        complete: '.checkbox > input'
     },
 
     triggers: {
         'click @ui.remove': 'remove:item',
         'dblclick @ui.edit': 'edit:item',
-        'blur @ui.editInput': 'edit:confirm'
+        'blur @ui.editInput': 'edit:confirm',
+        'change @ui.complete': 'item:complete'
     }
 });
 
@@ -38,8 +43,8 @@ var List = Marionette.CollectionView.extend({
     childViewEvents: {
         'remove:item': 'removeItem',
         'edit:item': 'editItem',
-        'input:blur': 'onInputBlur',
-        'edit:confirm': 'confirmChangesOfItem'
+        'edit:confirm': 'confirmChangesOfItem',
+        'item:complete': 'itemComplete'
     },
 
     removeItem: function(child) {
@@ -49,7 +54,6 @@ var List = Marionette.CollectionView.extend({
     editItem: function(child) {
         child.el.classList.add('edit');
         let editInput = child.el.children[0].children[3].value;
-        console.log(child.el.children[0].children[3].value);
     },
 
     confirmChangesOfItem: function(child) {
@@ -58,7 +62,21 @@ var List = Marionette.CollectionView.extend({
             text: editInput.value
         }, {validate: true});
         child.model.save();
-        editInput.style.display = 'none';
+        child.el.classList.remove('edit');
+    },
+
+    itemComplete: function(child) {
+        if(child.model.get('completed') == false) {
+            child.model.set({
+                completed: true,
+                checked: 'checked'
+            });
+        } else {
+            child.model.set({
+                completed: false,
+                checked: ''
+            });
+        }
     }
 });
 
