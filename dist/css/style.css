@@ -74,12 +74,12 @@ li {
     align-items: center;
 }
 
-.item.completed .text span {
+li.completed .item .text span {
     color: #d9d9d9;
     position: relative;
 }
 
-.item.completed .text span:before {
+li.completed .item .text span:before {
     content: '';
     position: absolute;
     left: 0;

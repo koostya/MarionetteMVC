@@ -2,21 +2,33 @@ import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 
 import template from '../templates/ListItem.html';
-import ItemModel from '../models/Item';
 
-var ListItem = Marionette.View.extend({
+const ListItem = Marionette.View.extend({
     tagName: 'li',
     template: template,
 
     initialize: function() {
         this.model.bind('change', this.render);
+        this.model.bind('set', this.render);
+        this.model.bind('get', this.render);
+        console.log('init', this.model);
+        // this.collection.bind('change', this.render);
     },
 
     render: function() {
         let text = this.model.get('text');
-
         $(this.el).html(this.template(this.model.toJSON()));
+
+        console.log('render', this.model);
+
+        if(this.model.get('completed') == true) {
+
+            this.el.classList.add('completed');
+        } else {
+            this.el.classList.remove('completed');
+        }
         this.model.save();
+        this.model.fetch();
 
         return this;
     },
@@ -47,6 +59,10 @@ var List = Marionette.CollectionView.extend({
         'item:complete': 'itemComplete'
     },
 
+    initialize: function() {
+        this.model.fetch();
+    },
+
     removeItem: function(child) {
         child.model.remove();
     },
@@ -66,6 +82,7 @@ var List = Marionette.CollectionView.extend({
     },
 
     itemComplete: function(child) {
+        console.log('item complete', child);
         if(child.model.get('completed') == false) {
             child.model.set({
                 completed: true,
@@ -77,6 +94,8 @@ var List = Marionette.CollectionView.extend({
                 checked: ''
             });
         }
+        this.model.save();
+        this.model.fetch();
     }
 });
 

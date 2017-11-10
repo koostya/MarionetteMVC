@@ -14,6 +14,8 @@ const InputView = Marionette.View.extend({
         this.collection.bind('add', this.render);
         this.collection.bind('remove', this.render);
         this.collection.bind('change', this.render);
+        this.model.bind('change', this.render);
+        this.model.bind('set', this.render);
     },
 
     render: function() {
@@ -23,6 +25,8 @@ const InputView = Marionette.View.extend({
         } else {
             this.$('.choose_all').hide();
         }
+
+        this.model.save();
 
         this.checkIsAllItemsCompleted();
     },
@@ -50,14 +54,13 @@ const InputView = Marionette.View.extend({
                 checked: ''
             });
 
-            this.model.set({
-                text: e.target.value,
-                completed: false,
-                checkboxID: this.model.createCheckboxID(),
-                checked: ''
-            }, {validate: true});
+            this.model.set(item);
 
-            this.collection.add(item);
+            this.collection.create(item);
+            console.log(this.collection);
+            // console.log(this.model.save(item));
+            this.model.save(item);
+            this.model.fetch(item);
         }
     },
 
