@@ -1,6 +1,6 @@
-<div class="item" id="">
+<div class="item<% if(completed == true) { %> completed <% } %><% if(editing == true) { %> edit <% } %>" id="">
     <div class="checkbox">
-        <input type="checkbox" id="<%- checkboxID %>" <%- checked %>>
+        <input type="checkbox" id="<%- checkboxID %>" <% if(completed == true) { %> checked <% } %>>
         <label for="<%- checkboxID %>"></label>
     </div>
     <div class="text">

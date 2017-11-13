@@ -20041,7 +20041,9 @@ var Item = _backbone2.default.Model.extend({
         text: '',
         completed: false,
         checkboxID: '',
-        checked: ''
+        checked: '',
+        editing: false,
+        itemsLeft: 0
     },
 
     url: 'items',
@@ -22647,17 +22649,7 @@ var ListItem = _backbone4.default.View.extend({
     },
 
     render: function render() {
-        var text = this.model.get('text');
         $(this.el).html(this.template(this.model.toJSON()));
-
-        if (this.model.get('completed') == true) {
-
-            this.el.classList.add('completed');
-        } else {
-            this.el.classList.remove('completed');
-        }
-        this.model.save();
-        this.model.fetch();
 
         return this;
     },
@@ -22699,25 +22691,26 @@ var List = _backbone4.default.CollectionView.extend({
     },
 
     editItem: function editItem(child) {
-        child.el.classList.add('edit');
+        child.model.set({
+            editing: true
+        });
     },
 
     confirmChangesOfItem: function confirmChangesOfItem(child) {
         var editInput = child.el.children[0].children[3];
 
         child.model.set({
-            text: editInput.value
+            text: editInput.value,
+            editing: false
         }, { validate: true });
 
         this.model.set({
-            text: editInput.value
+            text: editInput.value,
+            editing: false
         }, { validate: true });
 
         child.model.save();
         this.model.save();
-
-        child.$('.text > span').text(editInput.value);
-        child.el.classList.remove('edit');
     },
 
     itemComplete: function itemComplete(child) {
@@ -22726,13 +22719,11 @@ var List = _backbone4.default.CollectionView.extend({
                 completed: true,
                 checked: 'checked'
             });
-            child.el.classList.add('completed');
         } else {
             child.model.set({
                 completed: false,
                 checked: ''
             });
-            child.el.classList.remove('completed');
         }
         child.model.save();
         this.model.save();
@@ -22749,11 +22740,21 @@ exports.default = List;
 /* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="item" id="">\n    <div class="checkbox">\n        <input type="checkbox" id="'+
+__p+='<div class="item';
+ if(completed == true) { 
+__p+=' completed ';
+ } 
+__p+='';
+ if(editing == true) { 
+__p+=' edit ';
+ } 
+__p+='" id="">\n    <div class="checkbox">\n        <input type="checkbox" id="'+
 ((__t=( checkboxID ))==null?'':_.escape(__t))+
-'" '+
-((__t=( checked ))==null?'':_.escape(__t))+
-'>\n        <label for="'+
+'" ';
+ if(completed == true) { 
+__p+=' checked ';
+ } 
+__p+='>\n        <label for="'+
 ((__t=( checkboxID ))==null?'':_.escape(__t))+
 '"></label>\n    </div>\n    <div class="text">\n        <span>'+
 ((__t=( text ))==null?'':_.escape(__t))+
@@ -22800,12 +22801,20 @@ var Menu = _backbone4.default.View.extend({
         this.collection.bind('change', this.render);
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
+        this.model.bind('get', this.render);
     },
 
     render: function render() {
-        this.setItemsLeft();
-        this.defineCompletedItems();
-        this.defineTab();
+        // this.setItemsLeft();
+        // this.defineCompletedItems();
+        // this.defineTab();
+
+        $(this.el).html(this.template(this.model.toJSON()));
+        return this;
+    },
+
+    modelEvents: {
+        save: 'setItemsLeft'
     },
 
     ui: {
@@ -22823,18 +22832,19 @@ var Menu = _backbone4.default.View.extend({
     },
 
     setItemsLeft: function setItemsLeft() {
+        var countItemsLeft = 0;
+
         if (this.collection.length >= 1) {
-            $(this.el).html(this.template(_Menu2.default));
-            var itemsLeft = this.$('.items_left > span'),
-                countItemsLeft = 0;
             for (var i = 0; i < this.collection.models.length; i++) {
                 if (this.collection.models[i].get('completed') == false) {
                     countItemsLeft++;
                 }
             }
-            itemsLeft.text(countItemsLeft);
-        } else {
-            $(this.el).html('');
+            this.model.set({
+                itemsLeft: countItemsLeft
+            });
+            this.model.save();
+            this.model.fetch();
         }
     },
 
@@ -22944,16 +22954,19 @@ exports.default = Menu;
 
 /***/ }),
 /* 16 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = function(obj){
+/* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="menu_inner">\n    <div class="items_left">\n        <span></span> items left\n    </div>\n    <div class="tabs">\n        <div class="tab" id="all">All</div>\n        <div class="tab" id="active">Active</div>\n        <div class="tab" id="completed">Completed</div>\n    </div>\n    <button id="clear_completed">\n        Clear completed\n    </button>\n</div>\n';
+__p+='<div class="menu_inner">\n    <div class="items_left">\n        <span>'+
+((__t=( itemsLeft ))==null?'':_.escape(__t))+
+'</span> items left\n    </div>\n    <div class="tabs">\n        <div class="tab" id="all">All</div>\n        <div class="tab" id="active">Active</div>\n        <div class="tab" id="completed">Completed</div>\n    </div>\n    <button id="clear_completed">\n        Clear completed\n    </button>\n</div>\n';
 }
 return __p;
 };
 
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 17 */

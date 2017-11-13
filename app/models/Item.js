@@ -5,7 +5,9 @@ const Item = Backbone.Model.extend({
        text: '',
        completed: false,
        checkboxID: '',
-       checked: ''
+       checked: '',
+       editing: false,
+       itemsLeft: 0
    },
 
     url: 'items',

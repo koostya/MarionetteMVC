@@ -12,14 +12,20 @@ const Menu = Marionette.View.extend({
         this.collection.bind('change', this.render);
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
-
-
+        this.model.bind('get', this.render);
     },
 
     render: function() {
-        this.setItemsLeft();
-        this.defineCompletedItems();
-        this.defineTab();
+        // this.setItemsLeft();
+        // this.defineCompletedItems();
+        // this.defineTab();
+
+        $(this.el).html(this.template(this.model.toJSON()));
+        return this;
+    },
+
+    modelEvents: {
+        save: 'setItemsLeft'
     },
 
     ui: {
@@ -37,18 +43,19 @@ const Menu = Marionette.View.extend({
     },
 
     setItemsLeft: function() {
+        let countItemsLeft = 0;
+
         if(this.collection.length >= 1) {
-            $(this.el).html(this.template(template));
-            let itemsLeft = this.$('.items_left > span'),
-                countItemsLeft = 0;
             for(let i = 0; i < this.collection.models.length; i++) {
                 if(this.collection.models[i].get('completed') == false) {
                     countItemsLeft++;
                 }
             }
-            itemsLeft.text(countItemsLeft);
-        } else {
-            $(this.el).html('');
+            this.model.set({
+                itemsLeft: countItemsLeft
+            });
+            this.model.save();
+            this.model.fetch();
         }
     },
 
