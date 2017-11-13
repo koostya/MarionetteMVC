@@ -11,8 +11,6 @@ const ListItem = Marionette.View.extend({
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
         this.model.bind('get', this.render);
-        console.log('init', this.model);
-        // this.collection.bind('change', this.render);
     },
 
     render: function() {
@@ -60,6 +58,7 @@ var List = Marionette.CollectionView.extend({
     },
 
     initialize: function() {
+        this.model.save();
         this.model.fetch();
     },
 
@@ -82,7 +81,6 @@ var List = Marionette.CollectionView.extend({
     },
 
     itemComplete: function(child) {
-        console.log('item complete', child);
         if(child.model.get('completed') == false) {
             child.model.set({
                 completed: true,

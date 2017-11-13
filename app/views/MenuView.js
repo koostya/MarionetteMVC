@@ -117,7 +117,7 @@ const Menu = Marionette.View.extend({
         }
     },
 
-    loadAll: function(items) {
+    loadAll: function(items) {э
         for(let i = 0; i < this.collection.length; i++) {
             items[i].style.display = 'flex';
         }

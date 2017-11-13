@@ -22650,8 +22650,6 @@ var ListItem = _backbone4.default.View.extend({
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
         this.model.bind('get', this.render);
-        console.log('init', this.model);
-        // this.collection.bind('change', this.render);
     },
 
     render: function render() {
@@ -22699,6 +22697,7 @@ var List = _backbone4.default.CollectionView.extend({
     },
 
     initialize: function initialize() {
+        this.model.save();
         this.model.fetch();
     },
 
@@ -22721,7 +22720,6 @@ var List = _backbone4.default.CollectionView.extend({
     },
 
     itemComplete: function itemComplete(child) {
-        console.log('item complete', child);
         if (child.model.get('completed') == false) {
             child.model.set({
                 completed: true,
