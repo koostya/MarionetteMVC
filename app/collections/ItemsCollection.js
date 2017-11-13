@@ -17,6 +17,18 @@ const ItemsCollection = Backbone.Collection.extend({
 
     },
 
+    filter: {
+        value: 'all',
+
+        setVal: function(value) {
+            this.value = value;
+        },
+
+        getVal: function() {
+            return this.value;
+        }
+    },
+
     localStorage: new LocalStorage('ItemsList')
 });
 

@@ -17,8 +17,6 @@ const ListItem = Marionette.View.extend({
         let text = this.model.get('text');
         $(this.el).html(this.template(this.model.toJSON()));
 
-        console.log('render', this.model);
-
         if(this.model.get('completed') == true) {
 
             this.el.classList.add('completed');
@@ -57,26 +55,35 @@ var List = Marionette.CollectionView.extend({
         'item:complete': 'itemComplete'
     },
 
-    initialize: function() {
+    initialize: function(child) {
         this.model.save();
         this.model.fetch();
     },
 
     removeItem: function(child) {
         child.model.remove();
+        this.model.remove();
     },
 
     editItem: function(child) {
         child.el.classList.add('edit');
-        let editInput = child.el.children[0].children[3].value;
     },
 
     confirmChangesOfItem: function(child) {
         let editInput = child.el.children[0].children[3];
+
         child.model.set({
             text: editInput.value
         }, {validate: true});
+
+        this.model.set({
+            text: editInput.value
+        }, {validate: true});
+
         child.model.save();
+        this.model.save();
+
+        child.$('.text > span').text(editInput.value);
         child.el.classList.remove('edit');
     },
 
@@ -86,14 +93,16 @@ var List = Marionette.CollectionView.extend({
                 completed: true,
                 checked: 'checked'
             });
+            child.el.classList.add('completed');
         } else {
             child.model.set({
                 completed: false,
                 checked: ''
             });
+            child.el.classList.remove('completed');
         }
+        child.model.save();
         this.model.save();
-        this.model.fetch();
     }
 });
 

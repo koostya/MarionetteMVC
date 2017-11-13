@@ -20041,13 +20041,10 @@ var Item = _backbone2.default.Model.extend({
         text: '',
         completed: false,
         checkboxID: '',
-        checked: '',
-        filter: 'all'
+        checked: ''
     },
 
     url: 'items',
-
-    initialize: function initialize() {},
 
     remove: function remove() {
         this.destroy();
@@ -22553,12 +22550,9 @@ var InputView = _backbone2.default.View.extend({
                 checkboxID: this.model.createCheckboxID(),
                 checked: ''
             });
+            this.collection.create(item);
 
             this.model.set(item);
-
-            this.collection.create(item);
-            console.log(this.collection);
-            // console.log(this.model.save(item));
             this.model.save(item);
             this.model.fetch(item);
         }
@@ -22656,8 +22650,6 @@ var ListItem = _backbone4.default.View.extend({
         var text = this.model.get('text');
         $(this.el).html(this.template(this.model.toJSON()));
 
-        console.log('render', this.model);
-
         if (this.model.get('completed') == true) {
 
             this.el.classList.add('completed');
@@ -22696,26 +22688,35 @@ var List = _backbone4.default.CollectionView.extend({
         'item:complete': 'itemComplete'
     },
 
-    initialize: function initialize() {
+    initialize: function initialize(child) {
         this.model.save();
         this.model.fetch();
     },
 
     removeItem: function removeItem(child) {
         child.model.remove();
+        this.model.remove();
     },
 
     editItem: function editItem(child) {
         child.el.classList.add('edit');
-        var editInput = child.el.children[0].children[3].value;
     },
 
     confirmChangesOfItem: function confirmChangesOfItem(child) {
         var editInput = child.el.children[0].children[3];
+
         child.model.set({
             text: editInput.value
         }, { validate: true });
+
+        this.model.set({
+            text: editInput.value
+        }, { validate: true });
+
         child.model.save();
+        this.model.save();
+
+        child.$('.text > span').text(editInput.value);
         child.el.classList.remove('edit');
     },
 
@@ -22725,14 +22726,16 @@ var List = _backbone4.default.CollectionView.extend({
                 completed: true,
                 checked: 'checked'
             });
+            child.el.classList.add('completed');
         } else {
             child.model.set({
                 completed: false,
                 checked: ''
             });
+            child.el.classList.remove('completed');
         }
+        child.model.save();
         this.model.save();
-        this.model.fetch();
     }
 });
 
@@ -22858,73 +22861,81 @@ var Menu = _backbone4.default.View.extend({
     },
 
     changeTab: function changeTab(e) {
-        var tabs = this.$('.tab'),
+        var tabs = this.$('.tabs .active'),
             items = document.querySelectorAll('.item');
 
         for (var i = 0; i < tabs.length; i++) {
             tabs[i].classList.remove('active');
         }
 
-        this.model.set({
-            filter: e.target.id
-        });
-
         if (e.target.id == 'all') {
             this.loadAll(items);
+            this.$('#all')[0].classList.add('active');
         }
 
         if (e.target.id == 'active') {
             this.loadActive(items);
+            this.$('#active')[0].classList.add('active');
         }
 
         if (e.target.id == 'completed') {
             this.loadCompleted(items);
+            this.$('#completed')[0].classList.add('active');
         }
-
-        e.target.classList.add('active');
     },
 
     defineTab: function defineTab() {
         var tabs = this.$('.tab'),
             items = document.querySelectorAll('.item');
+        if (this.collection.length > 0) {
+            if (this.collection.filter.getVal() == 'all') {
+                this.loadAll(items);
+                this.$('#all')[0].classList.add('active');
+            }
 
-        if (this.model.get('filter') == 'all') {
-            this.loadAll(items);
-        }
+            if (this.collection.filter.getVal() == 'active') {
+                this.loadActive(items);
+                this.$('#active')[0].classList.add('active');
+            }
 
-        if (this.model.get('filter') == 'active') {
-            this.loadActive(items);
-        }
-
-        if (this.model.get('filter') == 'completed') {
-            this.loadCompleted(items);
+            if (this.collection.filter.getVal() == 'completed') {
+                this.loadCompleted(items);
+                this.$('#completed')[0].classList.add('active');
+            }
         }
     },
 
     loadAll: function loadAll(items) {
-        for (var i = 0; i < this.collection.length; i++) {
+        for (var i = 0; i < items.length; i++) {
             items[i].style.display = 'flex';
         }
+        this.collection.filter.setVal('all');
     },
 
     loadActive: function loadActive(items) {
-        for (var i = 0; i < this.collection.length; i++) {
-            if (this.collection.models[i].get('completed') == false) {
+        this.model.save();
+        this.model.fetch();
+        for (var i = 0; i < items.length; i++) {
+            if (!$('#list li')[i].classList.contains('completed')) {
                 items[i].style.display = 'flex';
             } else {
                 items[i].style.display = 'none';
             }
         }
+        this.collection.filter.setVal('active');
     },
 
     loadCompleted: function loadCompleted(items) {
-        for (var i = 0; i < this.collection.length; i++) {
-            if (this.collection.models[i].get('completed') == true) {
+        this.model.save();
+        this.model.fetch();
+        for (var i = 0; i < items.length; i++) {
+            if ($('#list li')[i].classList.contains('completed')) {
                 items[i].style.display = 'flex';
             } else {
                 items[i].style.display = 'none';
             }
         }
+        this.collection.filter.setVal('completed');
     }
 });
 
@@ -22938,7 +22949,7 @@ exports.default = Menu;
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="menu_inner">\n    <div class="items_left">\n        <span></span> items left\n    </div>\n    <div class="tabs">\n        <div class="tab active" id="all">All</div>\n        <div class="tab" id="active">Active</div>\n        <div class="tab" id="completed">Completed</div>\n    </div>\n    <button id="clear_completed">\n        Clear completed\n    </button>\n</div>\n';
+__p+='<div class="menu_inner">\n    <div class="items_left">\n        <span></span> items left\n    </div>\n    <div class="tabs">\n        <div class="tab" id="all">All</div>\n        <div class="tab" id="active">Active</div>\n        <div class="tab" id="completed">Completed</div>\n    </div>\n    <button id="clear_completed">\n        Clear completed\n    </button>\n</div>\n';
 }
 return __p;
 };
@@ -22991,6 +23002,18 @@ var ItemsCollection = _backbone2.default.Collection.extend({
     },
 
     render: function render() {},
+
+    filter: {
+        value: 'all',
+
+        setVal: function setVal(value) {
+            this.value = value;
+        },
+
+        getVal: function getVal() {
+            return this.value;
+        }
+    },
 
     localStorage: new _backbone3.LocalStorage('ItemsList')
 });

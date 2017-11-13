@@ -12,6 +12,8 @@ const Menu = Marionette.View.extend({
         this.collection.bind('change', this.render);
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
+
+
     },
 
     render: function() {
@@ -73,74 +75,81 @@ const Menu = Marionette.View.extend({
     },
 
     changeTab: function(e) {
-        let tabs = this.$('.tab'),
+        let tabs = this.$('.tabs .active'),
             items = document.querySelectorAll('.item');
 
         for(let i = 0; i < tabs.length; i++) {
             tabs[i].classList.remove('active');
         }
 
-        this.model.set({
-           filter: e.target.id
-        });
-
         if(e.target.id == 'all') {
             this.loadAll(items);
+            this.$('#all')[0].classList.add('active');
         }
 
         if(e.target.id == 'active') {
             this.loadActive(items);
+            this.$('#active')[0].classList.add('active');
         }
 
         if(e.target.id == 'completed') {
             this.loadCompleted(items);
+            this.$('#completed')[0].classList.add('active');
         }
-
-        e.target.classList.add('active');
     },
 
     defineTab: function() {
         let tabs = this.$('.tab'),
             items = document.querySelectorAll('.item');
+        if(this.collection.length > 0) {
+            if(this.collection.filter.getVal() == 'all') {
+                this.loadAll(items);
+                this.$('#all')[0].classList.add('active');
+            }
 
+            if(this.collection.filter.getVal() == 'active') {
+                this.loadActive(items);
+                this.$('#active')[0].classList.add('active');
+            }
 
-        if(this.model.get('filter') == 'all') {
-            this.loadAll(items);
-        }
-
-        if(this.model.get('filter') == 'active') {
-            this.loadActive(items);
-        }
-
-        if(this.model.get('filter') == 'completed') {
-            this.loadCompleted(items);
+            if(this.collection.filter.getVal() == 'completed') {
+                this.loadCompleted(items);
+                this.$('#completed')[0].classList.add('active');
+            }
         }
     },
 
-    loadAll: function(items) {э
-        for(let i = 0; i < this.collection.length; i++) {
+    loadAll: function(items) {
+        for(let i = 0; i < items.length; i++) {
             items[i].style.display = 'flex';
         }
+        this.collection.filter.setVal('all');
     },
 
     loadActive: function(items) {
-        for(let i = 0; i < this.collection.length; i++) {
-            if(this.collection.models[i].get('completed') == false) {
+        this.model.save();
+        this.model.fetch();
+        for(let i = 0; i < items.length; i++) {
+            if(!$('#list li')[i].classList.contains('completed')) {
                 items[i].style.display = 'flex';
             } else {
                 items[i].style.display = 'none';
             }
         }
+        this.collection.filter.setVal('active');
     },
 
     loadCompleted: function(items) {
-        for(let i = 0; i < this.collection.length; i++) {
-            if(this.collection.models[i].get('completed') == true) {
+        this.model.save();
+        this.model.fetch();
+        for(let i = 0; i < items.length; i++) {
+            if($('#list li')[i].classList.contains('completed')) {
                 items[i].style.display = 'flex';
             } else {
                 items[i].style.display = 'none';
             }
         }
+        this.collection.filter.setVal('completed');
     }
 });
 

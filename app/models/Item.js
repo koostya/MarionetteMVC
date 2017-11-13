@@ -5,15 +5,10 @@ const Item = Backbone.Model.extend({
        text: '',
        completed: false,
        checkboxID: '',
-       checked: '',
-       filter: 'all'
+       checked: ''
    },
 
     url: 'items',
-
-    initialize: function() {
-
-    },
 
     remove: function() {
         this.destroy();

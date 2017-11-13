@@ -53,12 +53,9 @@ const InputView = Marionette.View.extend({
                 checkboxID: this.model.createCheckboxID(),
                 checked: ''
             });
+            this.collection.create(item);
 
             this.model.set(item);
-
-            this.collection.create(item);
-            console.log(this.collection);
-            // console.log(this.model.save(item));
             this.model.save(item);
             this.model.fetch(item);
         }
