@@ -20,6 +20,10 @@ app.post('/items', function(req, res) {
     res.send(req.body);
 });
 
+app.delete('/items', function(req, res) {
+    res.send(req.body);
+});
+
 app.listen(8080, function() {
     console.log('Server started');
 });

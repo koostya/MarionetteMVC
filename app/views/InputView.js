@@ -20,16 +20,12 @@ const InputView = Marionette.View.extend({
     },
 
     render: function() {
-        $(this.el).html(this.template(template));
-        if(this.collection.length >= 1) {
-            this.$('.choose_all').show();
-        } else {
-            this.$('.choose_all').hide();
-        }
-
-        this.model.save();
-
         this.checkIsAllItemsCompleted();
+        this.showChooseAll();
+
+        $(this.el).html(this.template(this.model.toJSON()));
+
+        return this;
     },
 
     ui: {
@@ -44,6 +40,18 @@ const InputView = Marionette.View.extend({
     events: {
         'keypress @ui.input': 'AddItem',
         'change @ui.selectAllBut': 'CompleteAllItems'
+    },
+
+    showChooseAll: function() {
+        if(this.collection.length >= 1) {
+            this.model.set({
+                chooseAllShow: true
+            });
+        } else {
+            this.model.set({
+                chooseAllShow: false
+            });
+        }
     },
 
     AddItem: function(e) {
@@ -68,32 +76,40 @@ const InputView = Marionette.View.extend({
 
     CompleteAllItems: function() {
         let completed, checked;
-        if(this.$('#choose_all')[0].checked) {
-            completed = true;
-            checked = 'checked';
-        } else {
+
+        if(this.model.get('chooseAll') == 'checked') {
             completed = false;
             checked = '';
+        } else {
+            completed = true;
+            checked = 'checked';
         }
+
         for(let i = 0; i < this.collection.models.length; i++) {
             this.collection.models[i].set({
                 completed: completed,
                 checked: checked
             });
+            this.collection.models[i].save();
         }
     },
 
     checkIsAllItemsCompleted: function() {
         let count = 0;
+
         for(let i = 0; i < this.collection.models.length; i++) {
             if(this.collection.models[i].get('completed') == true) {
                 count++;
             }
         }
         if(count == this.collection.length) {
-            this.$('#choose_all')[0].checked = true;
+            this.model.set({
+                chooseAll: 'checked'
+            });
         } else {
-            this.$('#choose_all')[0].checked = false;
+            this.model.set({
+                chooseAll: ''
+            });
         }
     }
 });

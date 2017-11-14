@@ -261,6 +261,7 @@ li {
     height: 30px;
     top: 50%;
     transform: translateY(-50%);
+    visibility: hidden;
 }
 
 .choose_all.active {

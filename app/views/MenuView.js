@@ -19,6 +19,10 @@ const Menu = Marionette.View.extend({
         this.setItemsLeft();
         this.defineTab();
 
+        this.model.set({
+            collectionLength: this.collection.length
+        });
+
         $(this.el).html(this.template(this.model.toJSON()));
 
         return this;

@@ -1,5 +1,5 @@
 <input type="text" placeholder="What needs to be done?" id="main_input">
-<div class="choose_all">
-    <input type="checkbox" id="choose_all">
+<div class="choose_all" <% if(chooseAllShow) { %> style='visibility: visible;' <% } %>>
+    <input type="checkbox" id="choose_all" <%- chooseAll %>>
     <label for="choose_all"></label>
 </div>
