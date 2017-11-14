@@ -11,6 +11,7 @@ const ListItem = Marionette.View.extend({
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
         this.model.bind('get', this.render);
+        this.model.bind('remove', this.render);
     },
 
     render: function() {

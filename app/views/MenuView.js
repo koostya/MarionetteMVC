@@ -16,11 +16,11 @@ const Menu = Marionette.View.extend({
     },
 
     render: function() {
-        // this.setItemsLeft();
-        // this.defineCompletedItems();
-        // this.defineTab();
+        this.setItemsLeft();
+        this.defineTab();
 
         $(this.el).html(this.template(this.model.toJSON()));
+
         return this;
     },
 
@@ -51,25 +51,14 @@ const Menu = Marionette.View.extend({
                     countItemsLeft++;
                 }
             }
+
             this.model.set({
-                itemsLeft: countItemsLeft
+                itemsLeft: countItemsLeft,
+                collectionLength: this.collection.length
             });
+
             this.model.save();
             this.model.fetch();
-        }
-    },
-
-    defineCompletedItems: function() {
-        let count = 0;
-        for(let i = 0; i < this.collection.models.length; i++) {
-            if(this.collection.models[i].get('completed') == true) {
-                count++;
-            }
-        }
-        if(count > 0) {
-            this.$('#clear_completed').css('visibility', 'visible');
-        } else {
-            this.$('#clear_completed').css('visibility', 'hidden');
         }
     },
 
@@ -82,46 +71,35 @@ const Menu = Marionette.View.extend({
     },
 
     changeTab: function(e) {
-        let tabs = this.$('.tabs .active'),
-            items = document.querySelectorAll('.item');
-
-        for(let i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove('active');
-        }
+        let items = document.querySelectorAll('.item');
 
         if(e.target.id == 'all') {
             this.loadAll(items);
-            this.$('#all')[0].classList.add('active');
         }
 
         if(e.target.id == 'active') {
             this.loadActive(items);
-            this.$('#active')[0].classList.add('active');
         }
 
         if(e.target.id == 'completed') {
             this.loadCompleted(items);
-            this.$('#completed')[0].classList.add('active');
         }
     },
 
     defineTab: function() {
-        let tabs = this.$('.tab'),
-            items = document.querySelectorAll('.item');
+        let items = document.querySelectorAll('.item');
+
         if(this.collection.length > 0) {
-            if(this.collection.filter.getVal() == 'all') {
+            if(this.model.get('filter') == 'all') {
                 this.loadAll(items);
-                this.$('#all')[0].classList.add('active');
             }
 
-            if(this.collection.filter.getVal() == 'active') {
+            if(this.model.get('filter') == 'active') {
                 this.loadActive(items);
-                this.$('#active')[0].classList.add('active');
             }
 
-            if(this.collection.filter.getVal() == 'completed') {
+            if(this.model.get('filter') == 'completed') {
                 this.loadCompleted(items);
-                this.$('#completed')[0].classList.add('active');
             }
         }
     },
@@ -130,33 +108,47 @@ const Menu = Marionette.View.extend({
         for(let i = 0; i < items.length; i++) {
             items[i].style.display = 'flex';
         }
-        this.collection.filter.setVal('all');
+
+        this.model.set({
+           filter: 'all'
+        });
+
+        this.model.save();
+        this.model.fetch();
     },
 
     loadActive: function(items) {
-        this.model.save();
-        this.model.fetch();
         for(let i = 0; i < items.length; i++) {
-            if(!$('#list li')[i].classList.contains('completed')) {
+            if(this.collection.models[i].get('completed') == false) {
                 items[i].style.display = 'flex';
             } else {
                 items[i].style.display = 'none';
             }
         }
-        this.collection.filter.setVal('active');
+
+        this.model.set({
+            filter: 'active'
+        });
+
+        this.model.save();
+        this.model.fetch();
     },
 
     loadCompleted: function(items) {
-        this.model.save();
-        this.model.fetch();
         for(let i = 0; i < items.length; i++) {
-            if($('#list li')[i].classList.contains('completed')) {
+            if(this.collection.models[i].get('completed') == true) {
                 items[i].style.display = 'flex';
             } else {
                 items[i].style.display = 'none';
             }
         }
-        this.collection.filter.setVal('completed');
+
+        this.model.set({
+            filter: 'completed'
+        });
+
+        this.model.save();
+        this.model.fetch();
     }
 });
 

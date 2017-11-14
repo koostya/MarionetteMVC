@@ -1,13 +1,13 @@
-<div class="menu_inner">
+<div class="menu_inner"<% if(collectionLength > 0) { %> style='display: flex;' <% } %>>
     <div class="items_left">
         <span><%- itemsLeft %></span> items left
     </div>
     <div class="tabs">
-        <div class="tab" id="all">All</div>
-        <div class="tab" id="active">Active</div>
-        <div class="tab" id="completed">Completed</div>
+        <div class="tab<% if(filter == 'all') { %> active <% } %>" id="all">All</div>
+        <div class="tab<% if(filter == 'active') { %> active <% } %>" id="active">Active</div>
+        <div class="tab<% if(filter == 'completed') { %> active <% } %>" id="completed">Completed</div>
     </div>
-    <button id="clear_completed">
+    <button id="clear_completed"<% if(itemsLeft >= 0 && itemsLeft < collectionLength) { %> style='visibility: visible;' <% } %>>
         Clear completed
     </button>
 </div>

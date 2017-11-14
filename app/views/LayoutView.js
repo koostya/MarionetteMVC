@@ -5,6 +5,8 @@ import InputView from './InputView';
 import ListView from'./ListView';
 import MenuView from './MenuView';
 
+import MenuModel from '../models/Menu';
+
 import template from '../templates/Layout.html';
 
 const LayoutView = Marionette.View.extend({
@@ -21,7 +23,7 @@ const LayoutView = Marionette.View.extend({
     onShow: function() {
         this.showChildView('input', new InputView({model: this.model, collection: this.collection}));
         this.showChildView('list', new ListView({model: this.model, collection: this.collection}));
-        this.showChildView('menu', new MenuView({model: this.model, collection: this.collection}));
+        this.showChildView('menu', new MenuView({model: new MenuModel(), collection: this.collection, itemModel: this.model}));
     },
 
     initialize: function() {

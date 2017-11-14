@@ -16,6 +16,7 @@ const InputView = Marionette.View.extend({
         this.collection.bind('change', this.render);
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
+        this.model.bind('destroy', this.render);
     },
 
     render: function() {

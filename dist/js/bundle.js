@@ -22040,7 +22040,7 @@ var _Item = __webpack_require__(5);
 
 var _Item2 = _interopRequireDefault(_Item);
 
-var _ItemsCollection = __webpack_require__(18);
+var _ItemsCollection = __webpack_require__(19);
 
 var _ItemsCollection2 = _interopRequireDefault(_ItemsCollection);
 
@@ -22447,7 +22447,11 @@ var _MenuView = __webpack_require__(15);
 
 var _MenuView2 = _interopRequireDefault(_MenuView);
 
-var _Layout = __webpack_require__(17);
+var _Menu = __webpack_require__(17);
+
+var _Menu2 = _interopRequireDefault(_Menu);
+
+var _Layout = __webpack_require__(18);
 
 var _Layout2 = _interopRequireDefault(_Layout);
 
@@ -22467,7 +22471,7 @@ var LayoutView = _backbone4.default.View.extend({
     onShow: function onShow() {
         this.showChildView('input', new _InputView2.default({ model: this.model, collection: this.collection }));
         this.showChildView('list', new _ListView2.default({ model: this.model, collection: this.collection }));
-        this.showChildView('menu', new _MenuView2.default({ model: this.model, collection: this.collection }));
+        this.showChildView('menu', new _MenuView2.default({ model: new _Menu2.default(), collection: this.collection, itemModel: this.model }));
     },
 
     initialize: function initialize() {
@@ -22515,6 +22519,7 @@ var InputView = _backbone2.default.View.extend({
         this.collection.bind('change', this.render);
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
+        this.model.bind('destroy', this.render);
     },
 
     render: function render() {
@@ -22646,6 +22651,7 @@ var ListItem = _backbone4.default.View.extend({
         this.model.bind('change', this.render);
         this.model.bind('set', this.render);
         this.model.bind('get', this.render);
+        this.model.bind('remove', this.render);
     },
 
     render: function render() {
@@ -22805,11 +22811,11 @@ var Menu = _backbone4.default.View.extend({
     },
 
     render: function render() {
-        // this.setItemsLeft();
-        // this.defineCompletedItems();
-        // this.defineTab();
+        this.setItemsLeft();
+        this.defineTab();
 
         $(this.el).html(this.template(this.model.toJSON()));
+
         return this;
     },
 
@@ -22840,25 +22846,14 @@ var Menu = _backbone4.default.View.extend({
                     countItemsLeft++;
                 }
             }
+
             this.model.set({
-                itemsLeft: countItemsLeft
+                itemsLeft: countItemsLeft,
+                collectionLength: this.collection.length
             });
+
             this.model.save();
             this.model.fetch();
-        }
-    },
-
-    defineCompletedItems: function defineCompletedItems() {
-        var count = 0;
-        for (var i = 0; i < this.collection.models.length; i++) {
-            if (this.collection.models[i].get('completed') == true) {
-                count++;
-            }
-        }
-        if (count > 0) {
-            this.$('#clear_completed').css('visibility', 'visible');
-        } else {
-            this.$('#clear_completed').css('visibility', 'hidden');
         }
     },
 
@@ -22871,46 +22866,35 @@ var Menu = _backbone4.default.View.extend({
     },
 
     changeTab: function changeTab(e) {
-        var tabs = this.$('.tabs .active'),
-            items = document.querySelectorAll('.item');
-
-        for (var i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove('active');
-        }
+        var items = document.querySelectorAll('.item');
 
         if (e.target.id == 'all') {
             this.loadAll(items);
-            this.$('#all')[0].classList.add('active');
         }
 
         if (e.target.id == 'active') {
             this.loadActive(items);
-            this.$('#active')[0].classList.add('active');
         }
 
         if (e.target.id == 'completed') {
             this.loadCompleted(items);
-            this.$('#completed')[0].classList.add('active');
         }
     },
 
     defineTab: function defineTab() {
-        var tabs = this.$('.tab'),
-            items = document.querySelectorAll('.item');
+        var items = document.querySelectorAll('.item');
+
         if (this.collection.length > 0) {
-            if (this.collection.filter.getVal() == 'all') {
+            if (this.model.get('filter') == 'all') {
                 this.loadAll(items);
-                this.$('#all')[0].classList.add('active');
             }
 
-            if (this.collection.filter.getVal() == 'active') {
+            if (this.model.get('filter') == 'active') {
                 this.loadActive(items);
-                this.$('#active')[0].classList.add('active');
             }
 
-            if (this.collection.filter.getVal() == 'completed') {
+            if (this.model.get('filter') == 'completed') {
                 this.loadCompleted(items);
-                this.$('#completed')[0].classList.add('active');
             }
         }
     },
@@ -22919,33 +22903,47 @@ var Menu = _backbone4.default.View.extend({
         for (var i = 0; i < items.length; i++) {
             items[i].style.display = 'flex';
         }
-        this.collection.filter.setVal('all');
+
+        this.model.set({
+            filter: 'all'
+        });
+
+        this.model.save();
+        this.model.fetch();
     },
 
     loadActive: function loadActive(items) {
-        this.model.save();
-        this.model.fetch();
         for (var i = 0; i < items.length; i++) {
-            if (!$('#list li')[i].classList.contains('completed')) {
+            if (this.collection.models[i].get('completed') == false) {
                 items[i].style.display = 'flex';
             } else {
                 items[i].style.display = 'none';
             }
         }
-        this.collection.filter.setVal('active');
+
+        this.model.set({
+            filter: 'active'
+        });
+
+        this.model.save();
+        this.model.fetch();
     },
 
     loadCompleted: function loadCompleted(items) {
-        this.model.save();
-        this.model.fetch();
         for (var i = 0; i < items.length; i++) {
-            if ($('#list li')[i].classList.contains('completed')) {
+            if (this.collection.models[i].get('completed') == true) {
                 items[i].style.display = 'flex';
             } else {
                 items[i].style.display = 'none';
             }
         }
-        this.collection.filter.setVal('completed');
+
+        this.model.set({
+            filter: 'completed'
+        });
+
+        this.model.save();
+        this.model.fetch();
     }
 });
 
@@ -22959,9 +22957,29 @@ exports.default = Menu;
 /* WEBPACK VAR INJECTION */(function(_) {module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<div class="menu_inner">\n    <div class="items_left">\n        <span>'+
+__p+='<div class="menu_inner"';
+ if(collectionLength > 0) { 
+__p+=' style=\'display: flex;\' ';
+ } 
+__p+='>\n    <div class="items_left">\n        <span>'+
 ((__t=( itemsLeft ))==null?'':_.escape(__t))+
-'</span> items left\n    </div>\n    <div class="tabs">\n        <div class="tab" id="all">All</div>\n        <div class="tab" id="active">Active</div>\n        <div class="tab" id="completed">Completed</div>\n    </div>\n    <button id="clear_completed">\n        Clear completed\n    </button>\n</div>\n';
+'</span> items left\n    </div>\n    <div class="tabs">\n        <div class="tab';
+ if(filter == 'all') { 
+__p+=' active ';
+ } 
+__p+='" id="all">All</div>\n        <div class="tab';
+ if(filter == 'active') { 
+__p+=' active ';
+ } 
+__p+='" id="active">Active</div>\n        <div class="tab';
+ if(filter == 'completed') { 
+__p+=' active ';
+ } 
+__p+='" id="completed">Completed</div>\n    </div>\n    <button id="clear_completed"';
+ if(itemsLeft >= 0 && itemsLeft < collectionLength) { 
+__p+=' style=\'visibility: visible;\' ';
+ } 
+__p+='>\n        Clear completed\n    </button>\n</div>\n';
 }
 return __p;
 };
@@ -22970,19 +22988,6 @@ return __p;
 
 /***/ }),
 /* 17 */
-/***/ (function(module, exports) {
-
-module.exports = function(obj){
-var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
-with(obj||{}){
-__p+='<div class="input_wrapper main_input_wrapper">\n\n</div>\n<div id="list">\n    <ul></ul>\n</div>\n<div id="menu" class="menu">\n\n</div>\n\n';
-}
-return __p;
-};
-
-
-/***/ }),
-/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22996,7 +23001,55 @@ var _backbone = __webpack_require__(0);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
-var _backbone3 = __webpack_require__(19);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Menu = _backbone2.default.Model.extend({
+    defaults: {
+        itemsLeft: 0,
+        filter: 'all',
+        collectionLength: 0
+    },
+
+    url: 'items',
+
+    remove: function remove() {
+        this.destroy();
+    },
+
+    validate: function validate(args) {}
+});
+
+exports.default = Menu;
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<div class="input_wrapper main_input_wrapper">\n\n</div>\n<div id="list">\n    <ul></ul>\n</div>\n<div id="menu" class="menu">\n\n</div>\n\n';
+}
+return __p;
+};
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _backbone = __webpack_require__(0);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _backbone3 = __webpack_require__(20);
 
 var _Item = __webpack_require__(5);
 
@@ -23034,7 +23087,7 @@ var ItemsCollection = _backbone2.default.Collection.extend({
 exports.default = ItemsCollection;
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function webpackUniversalModuleDefinition(root, factory) {
